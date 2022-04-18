@@ -3,9 +3,9 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ApiConfig } from "../../api/config";
 import { removeOrder } from "../../redux/reducers/orderSlice";
-import StripeCheckout from "react-stripe-checkout";
 import axios from "axios";
 import { toast } from "react-toastify";
+import KhaltiCheckout from "khalti-checkout-web";
 
 function prepareOrderToCheckout(orders) {
   let items = [];
@@ -14,6 +14,7 @@ function prepareOrderToCheckout(orders) {
   });
   return items;
 }
+
 
 const OrdersPage = () => {
   const dispatch = useDispatch();
@@ -25,6 +26,55 @@ const OrdersPage = () => {
     let item = checkout.find((c) => c._id === itemId);
     return item.quantity;
   };
+
+  let config = {
+    // replace this key with yours
+    "publicKey": process.env.REACT_APP_KHALTI_KEY,
+    "productIdentity": "1234567890",
+    "productName": "Drogon",
+    "productUrl": "http://gameofthrones.com/buy/Dragons",
+    "eventHandler": {
+      onSuccess(payload) {
+        let body = {
+          token: payload.token,
+          // amount: payload.amount,
+          checkout,
+          total: payload.amount,
+        };
+        return axios
+          .post(ApiConfig.ORDER.createOrder, body, {
+            headers: {
+              ...ApiConfig.HEADERS,
+              Authorization: `Bearer ${localStorage.getItem("_t")}`,
+              "Content-Type": "application/json",
+            },
+          })
+          .then((res) => console.log(res))
+          .catch((error) =>
+            toast.error(
+              error.response?.data?.message ??
+              error.message ??
+              "Internal server error."
+            )
+          );
+      },
+      // onError handler is optional
+      onError(error) {
+        // handle errors
+        console.log(error);
+      },
+      onClose() {
+        console.log('widget is closing');
+      }
+    },
+    "paymentPreference": ["KHALTI", "EBANKING", "MOBILE_BANKING", "CONNECT_IPS", "SCT"],
+  };
+
+  const handleKhalti = () => {
+    let checkout = new KhaltiCheckout(config);
+    checkout.show({ amount: calculatePrice() * 100 });
+  }
+
 
   const changeQuantity = (itemId, value) => {
     let orders = [];
@@ -55,28 +105,9 @@ const OrdersPage = () => {
     return total;
   };
 
-  const handleToken = (token) => {
-    let body = {
-      token,
-      checkout,
-      total: calculatePrice(),
-    };
-    return axios
-      .post(ApiConfig.ORDER.createOrder, body, {
-        headers: {
-          ...ApiConfig.HEADERS,
-          "Content-Type": "application/json",
-        },
-      })
-      .then((res) => console.log(res))
-      .catch((error) =>
-        toast.error(
-          error.response?.data?.message ??
-            error.message ??
-            "Internal server error."
-        )
-      );
-  };
+  // const handleToken = (token) => {
+
+  // };
 
   return orders.length < 1 ? (
     <div className="w-full h-full grid place-items-center">
@@ -110,7 +141,7 @@ const OrdersPage = () => {
           </thead>
           <tbody className="border-2">
             {checkout.map((c) => (
-              <tr className="border-2">
+              <tr className="border-2" key={c.name}>
                 <td className="px-2">{c.name}</td>
                 <td className="border-l-2 text-center">{c.quantity}</td>
                 <td className="border-l-2 text-center">
@@ -124,16 +155,9 @@ const OrdersPage = () => {
             </tr>
           </tbody>
         </table>
-        <StripeCheckout
-          stripeKey={process.env.REACT_APP_STRIPE_SECRET}
-          token={handleToken}
-          email={user.email}
-          shippingAddress
-        >
-          <button className="py-2 px-4 bg-orange-500 hover:bg-orange-600 text-white rounded w-full">
-            Confirm
-          </button>
-        </StripeCheckout>
+        <button onClick={handleKhalti} className="py-2 px-4 bg-orange-500 hover:bg-orange-600 text-white rounded w-full">
+          Confirm
+        </button>
       </aside>
     </div>
   );
@@ -141,7 +165,7 @@ const OrdersPage = () => {
 
 const OrderCard = ({ item, quantity, handleQuantity, handleRemove }) => {
   return (
-    <section className="w-full flex bg-white rounded-md items-start justify-between p-2">
+    <section className="w-full flex bg-white rounded-md items-start justify-between p-2 shadow-lg">
       <aside className="flex">
         <img alt="item" width={200} height={200} src={item.image.url} />
         <div className="p-2">
