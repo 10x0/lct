@@ -7,12 +7,12 @@ class ApiFeatures {
   search() {
     const keyword = this.queryString.keyword
       ? {
-          name: {
-            // MONGODB REGEX OPERATOR
-            $regex: this.queryString.keyword,
-            $options: "i", // case-insensitive
-          },
-        }
+        name: {
+          // MONGODB REGEX OPERATOR
+          $regex: this.queryString.keyword,
+          $options: "i", // case-insensitive
+        },
+      }
       : {};
 
     this.query = this.query.find({ ...keyword });
@@ -26,11 +26,13 @@ class ApiFeatures {
 
     // Price and Ratings
     let queryString = JSON.stringify(queryCopy);
+
     // Replacing gt -> $gt [FOR MONGODB OPERATION]
     queryString = queryString.replace(
       /\b(gt|gte|lt|lte)\b/g,
       (key) => `${$key}`
     );
+
     this.query = this.query.find(JSON.parse(queryString));
     return this;
   }

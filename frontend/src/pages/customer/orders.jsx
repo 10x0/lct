@@ -1,11 +1,12 @@
 import { XIcon } from "@heroicons/react/outline";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { ApiConfig } from "../../api/config";
-import { removeOrder } from "../../redux/reducers/orderSlice";
+import { API } from "../../api/config";
+import { removeAllOrders, removeOrder } from "../../redux/reducers/orderSlice";
 import axios from "axios";
 import { toast } from "react-toastify";
 import KhaltiCheckout from "khalti-checkout-web";
+import { useNavigate } from "react-router-dom";
 
 function prepareOrderToCheckout(orders) {
   let items = [];
@@ -17,8 +18,8 @@ function prepareOrderToCheckout(orders) {
 
 
 const OrdersPage = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.authState);
   const { orders } = useSelector((state) => state.orderState);
   const [checkout, setCheckout] = useState(prepareOrderToCheckout(orders));
 
@@ -36,20 +37,20 @@ const OrdersPage = () => {
     "eventHandler": {
       onSuccess(payload) {
         let body = {
-          token: payload.token,
-          // amount: payload.amount,
           checkout,
-          total: payload.amount,
+          total: calculatePrice(),
         };
         return axios
-          .post(ApiConfig.ORDER.createOrder, body, {
+          .post(API.ORDER.createOrder, body, {
             headers: {
-              ...ApiConfig.HEADERS,
+              Accept: "application/json",
               Authorization: `Bearer ${localStorage.getItem("_t")}`,
-              "Content-Type": "application/json",
             },
           })
-          .then((res) => console.log(res))
+          .then((res) => {
+            dispatch(removeAllOrders());
+            navigate('/menu');
+          })
           .catch((error) =>
             toast.error(
               error.response?.data?.message ??
@@ -58,9 +59,7 @@ const OrdersPage = () => {
             )
           );
       },
-      // onError handler is optional
       onError(error) {
-        // handle errors
         console.log(error);
       },
       onClose() {
@@ -72,7 +71,7 @@ const OrdersPage = () => {
 
   const handleKhalti = () => {
     let checkout = new KhaltiCheckout(config);
-    checkout.show({ amount: calculatePrice() * 100 });
+    checkout.show({ amount: 1000 });
   }
 
 
@@ -104,10 +103,6 @@ const OrdersPage = () => {
     );
     return total;
   };
-
-  // const handleToken = (token) => {
-
-  // };
 
   return orders.length < 1 ? (
     <div className="w-full h-full grid place-items-center">

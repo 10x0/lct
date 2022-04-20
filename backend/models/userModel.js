@@ -22,7 +22,11 @@ const userSchema = mongoose.Schema({
   },
   contact: {
     type: String,
-    requried: [true, "Please provide mobile number."],
+    required: [true, "Please provide mobile number."],
+  },
+  verified: {
+    type: Boolean,
+    default: false,
   },
   role: {
     type: String,

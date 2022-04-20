@@ -13,6 +13,7 @@ import NotFound from "./pages/NotFound";
 import routesConfig from "./routes/routesConfig";
 import Sidebar from "./components/Sidebar";
 import Loading from "./components/Loading";
+import { API } from "./api/config";
 
 function App() {
   const dispatch = useDispatch();
@@ -23,7 +24,7 @@ function App() {
       return routesConfig.filter((i) =>
         i.roles.some(
           (it) =>
-            it === user?.role || (it === "all" && user?.role === "customer")
+            it === user?.role || (it === "all" || user?.role === "customer")
         )
       );
     }
@@ -38,11 +39,14 @@ function App() {
     const token = localStorage.getItem("_t");
     if (token) {
       axios
-        .get(`${process.env.REACT_APP_API_BASE_URL}/ums/self`, {
-          headers: { Authorization: "Bearer " + token },
-        })
+        .get(API.AUTH.getProfile, {
+          headers:{
+          Accept: "application/json",
+          Authorization: `Bearer ${localStorage.getItem("_t")}`,
+        }
+      })
         .then((res) => {
-          dispatch(loginSuccess(res.data.user));
+          dispatch(loginSuccess(res.data));
         })
         .catch((err) => dispatch(loginFailure()));
     } else {

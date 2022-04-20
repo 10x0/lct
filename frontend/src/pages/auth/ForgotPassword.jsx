@@ -15,14 +15,13 @@ import {
 import Loading from "../../components/Loading";
 import { API } from "../../api/config";
 
-const LoginPage = () => {
+const ForgotPasswordPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { loading, error } = useSelector((state) => state.authState);
   const initialValues = useMemo(
     () => ({
       email: "",
-      password: "",
     }),
     []
   );
@@ -30,9 +29,10 @@ const LoginPage = () => {
   const onSubmit = async (values, { resetForm }) => {
     dispatch(loginPending());
     try {
-      const res = await axios.post(API.AUTH.login, values);
+      const res = await axios.post(API.auth, values);
+      localStorage.setItem("_t", res.data.token);
+      dispatch(loginSuccess(res.data.user));
       navigate("/menu", { replace: true });
-      dispatch(loginSuccess(res.data));
     } catch (error) {
       dispatch(
         loginFailure(
@@ -66,13 +66,6 @@ const LoginPage = () => {
               placeholder="Enter your email"
             />
 
-            <InputField
-              name="password"
-              type="password"
-              label="Password"
-              placeholder="Enter your password"
-            />
-
             {loading ? (
               <Loading />
             ) : (
@@ -81,13 +74,13 @@ const LoginPage = () => {
                   type="submit"
                   className="mt-8 py-2 px-4 bg-orange-500 hover:bg-orange-600 text-white rounded w-full"
                 >
-                  Log in
+                  Forgot password
                 </button>
                 <Link
-                  to="/forgotPassword"
+                  to="/login"
                   className="mt-2 md:ml-8 text-blue-500 block text-center"
                 >
-                  Forgot password?
+                  Go back?
                 </Link>
               </>
             )}
@@ -98,4 +91,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default ForgotPasswordPage;

@@ -3,7 +3,7 @@ dotenv.config();
 const asyncHandler = require("../utils/asyncHandler");
 const { User, Order } = require("../models");
 const ApiFeatures = require("../utils/apiFeatures");
-const axios = require('axios');
+const jwt = require("jsonwebtoken");
 
 exports.getOrders = asyncHandler(async (req, res, next) => {
   const resultsPerPage = 5;
@@ -22,31 +22,10 @@ exports.getOrders = asyncHandler(async (req, res, next) => {
 });
 
 exports.createOrder = asyncHandler(async (req, res, next) => {
-  let { checkout, token, total } = req.body;
-
-  let data = {
-    token,
-    "amount": total
-  };
-
-  let config = {
-    headers: { 'Authorization': 'Key ' + process.env.KHALTI_SECRET_KEY }
-  };
-
-  // KHALTI
-  axios.post("https://khalti.com/api/v2/payment/verify/", data, config)
-    .then(response => {
-      console.log(response.data);
-    })
-    .catch(error => {
-      console.log(error);
-    });
-
-  const user = await User.findOne({ email: token.email }).select("+password");
-  if (!user) return next(new ErrorHandler("User not found.", 401));
+  let { checkout, total } = req.body;
 
   await Order.create({
-    user,
+    customer: req.user.email,
     items: checkout,
     total,
   });
@@ -55,4 +34,5 @@ exports.createOrder = asyncHandler(async (req, res, next) => {
     success: true,
     message: "Order created succesfully.",
   });
+
 });

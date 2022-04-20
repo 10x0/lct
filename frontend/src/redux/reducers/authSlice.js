@@ -14,7 +14,8 @@ export const loginSlice = createSlice({
     loginSuccess: (state, { payload }) => {
       state.loading = false;
       state.authenticated = true;
-      state.user = payload;
+      state.user = payload.user;
+      localStorage.setItem('_t',payload.token);
     },
     loginFailure: (state) => {
       state.loading = false;

@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { ApiConfig } from "../../api/config";
+import { API } from "../../api/config";
 import ItemCard from "../../components/Item/Card";
 
 const Items = () => {
@@ -9,8 +9,11 @@ const Items = () => {
   useEffect(() => {
     const fetchItems = async () => {
       await axios
-        .get(ApiConfig.ITEM.getAllItems, {
-          headers: ApiConfig.HEADERS,
+        .get(API.ITEM.getAllItems, {
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${localStorage.getItem("_t")}`,
+          },
         })
         .then((res) => setItems(res.data.allItem))
         .catch((error) =>

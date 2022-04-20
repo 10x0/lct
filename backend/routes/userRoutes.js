@@ -2,7 +2,6 @@ const express = require("express");
 const {
   registerUser,
   loginUser,
-  // logoutUser,
   forgotPassword,
   resetPassword,
   getSelfDetails,

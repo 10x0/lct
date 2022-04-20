@@ -18,7 +18,7 @@ const routesConfig = [
     path: "/menu",
     title: "Menu",
     component: Items,
-    roles: ["all"],
+    roles: ["all","customer"],
   },
   {
     path: "/login",

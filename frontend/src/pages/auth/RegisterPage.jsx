@@ -14,6 +14,7 @@ import {
   loginSuccess,
 } from "../../redux/reducers/authSlice";
 import Loading from "../../components/Loading";
+import { API } from "../../api/config";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
@@ -34,12 +35,11 @@ const RegisterPage = () => {
     dispatch(loginPending());
     try {
       const res = await axios.post(
-        `${process.env.REACT_APP_API_BASE_URL}/ums/register`,
+        API.AUTH.register,
         values
       );
-      dispatch(loginSuccess(res.data.user));
-      localStorage.setItem("_t", res.data.token);
-      navigate("/");
+      navigate("/menu");
+      dispatch(loginSuccess(res.data));
     } catch (error) {
       dispatch(loginFailure());
       toast.error(

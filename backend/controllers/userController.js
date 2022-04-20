@@ -6,11 +6,12 @@ const { sendToken } = require("../utils/jwtHandler");
 const sendMail = require("../utils/sendMail");
 
 exports.registerUser = asyncHandler(async (req, res, next) => {
-  const { name, email, password } = req.body;
+  const { name, email, password,contact } = req.body;
   const user = await User.create({
     name,
     email,
     password,
+    contact
   });
 
   const message = `Hi, ${name}.\nThanks for registering in Lunch Time. Hope to serve you best food for your lunch.🙂`;
@@ -45,13 +46,6 @@ exports.loginUser = asyncHandler(async (req, res, next) => {
   sendToken(user, 200, res);
 });
 
-// exports.logoutUser = asyncHandler(async (req, res, next) => {
-//   res.status(200).json({
-//     success: true,
-//     message: "Logged out successfully.",
-//   });
-// });
-
 exports.forgotPassword = asyncHandler(async (req, res, next) => {
   const user = await User.findOne({ email: req.body.email });
 
@@ -65,7 +59,7 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
 
   const resetURL = `${req.protocol}://${req.get(
     "host"
-  )}/api/v1/ums/resetPassword/${resetToken}`;
+  )}/reset/${resetToken}`;
 
   const message = `Reset your password at :- \n\n ${resetURL} \n\nIf you have not requested this email then, please ignore it.`;
   try {
@@ -119,7 +113,7 @@ exports.resetPassword = asyncHandler(async (req, res, next) => {
 exports.getSelfDetails = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id);
 
-  res.status(200).json({ success: true, user });
+  sendToken(user, 200, res);
 });
 
 exports.changePassword = asyncHandler(async (req, res, next) => {

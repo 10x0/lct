@@ -2,7 +2,7 @@ import { PlusSmIcon, XIcon } from "@heroicons/react/outline";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { ApiConfig } from "../../../api/config";
+import { API } from "../../../api/config";
 import ItemCard from "../../../components/Item/Card";
 import Loading from "../../../components/Loading";
 
@@ -36,10 +36,11 @@ const ItemsPage = () => {
     formData.append("type", type);
     formData.append("image", image);
     await axios
-      .post(ApiConfig.ITEM.addItem, formData, {
+      .post(API.ITEM.addItem, formData, {
         headers: {
-          ...ApiConfig.HEADERS,
-          "Content-Type": "multipart/form-data",
+            "Accept": "application/json",
+            "Content-Type": "multipart/form-data",
+            "Authorization": `Bearer ${localStorage.getItem("_t")}`,
         },
       })
       .then((res) => {
@@ -64,8 +65,8 @@ const ItemsPage = () => {
   useEffect(() => {
     const fetchItems = async () => {
       await axios
-        .get(ApiConfig.ITEM.getAllItems, {
-          headers: ApiConfig.HEADERS,
+        .get(API.ITEM.getAllItems, {
+          headers: API.HEADERS,
         })
         .then((res) => setItems(res.data.allItem))
         .catch((error) =>

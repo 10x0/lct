@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
 const itemModel = require("./itemModel");
-const userModel = require("./userModel");
 
 const orderSchema = mongoose.Schema(
   {
-    user: {
-      type: userModel.schema,
+    customer: {
+      type: String,
+      unique: false,
       required: true,
     },
     items: {
