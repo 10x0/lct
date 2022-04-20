@@ -1,24 +1,16 @@
 import { Formik, Form } from "formik";
-import { useMemo } from "react";
-import * as Yup from "yup";
+import { useMemo, useState } from "react";
 import axios from "axios";
 import { InputField } from "../../components/Field";
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
-import {
-  loginFailure,
-  loginPending,
-  loginSuccess,
-} from "../../redux/reducers/authSlice";
 import Loading from "../../components/Loading";
 import { API } from "../../api/config";
 
 const ForgotPasswordPage = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const { loading, error } = useSelector((state) => state.authState);
+  const [loading,setLoading] = useState(false);
   const initialValues = useMemo(
     () => ({
       email: "",
@@ -27,20 +19,14 @@ const ForgotPasswordPage = () => {
   );
 
   const onSubmit = async (values, { resetForm }) => {
-    dispatch(loginPending());
+    setLoading(true);
     try {
-      const res = await axios.post(API.auth, values);
-      localStorage.setItem("_t", res.data.token);
-      dispatch(loginSuccess(res.data.user));
-      navigate("/menu", { replace: true });
+      await axios.post(API.AUTH.forgotPassword, values);
+      toast.success('Please check your mail.',{position:toast.POSITION.TOP_CENTER});
+      setLoading(false);
+      navigate("/login", { replace: true });
     } catch (error) {
-      dispatch(
-        loginFailure(
-          error.response?.data?.message ??
-            error.message ??
-            "Internal server error."
-        )
-      );
+      setLoading(false);
       toast.error(
         error.response?.data?.message ??
           error.message ??
@@ -56,7 +42,8 @@ const ForgotPasswordPage = () => {
   return (
     <section className="flex-grow flex justify-center items-center">
       <div className="p-4 w-full md:w-1/4">
-        <div className="text-start mb-4 font-bold text-2xl">Log In</div>
+        <div className="text-start mb-4 font-bold text-2xl">Enter registered email</div>
+       
         <Formik initialValues={initialValues} onSubmit={onSubmit}>
           <Form>
             <InputField
@@ -65,6 +52,7 @@ const ForgotPasswordPage = () => {
               label="Email"
               placeholder="Enter your email"
             />
+             <div className="text-start mb-4 text-gray-400">We'll sent a link to reset password, if email is registered.</div>
 
             {loading ? (
               <Loading />
@@ -78,7 +66,7 @@ const ForgotPasswordPage = () => {
                 </button>
                 <Link
                   to="/login"
-                  className="mt-2 md:ml-8 text-blue-500 block text-center"
+                  className="mt-2 text-blue-500 block text-center"
                 >
                   Go back?
                 </Link>

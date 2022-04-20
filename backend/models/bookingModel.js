@@ -10,8 +10,12 @@ const bookingSchema = mongoose.Schema(
             type: String,
             required: [true, 'Please provide contact details.'],
         },
-        datetime: {
-            type: Date,
+        date: {
+            type: String,
+            required: [true, 'Please provide booking date.'],
+        },
+        time: {
+            type: String,
             required: [true, 'Please provide booking date.'],
         },
         duration: {

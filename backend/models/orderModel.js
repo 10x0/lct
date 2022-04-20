@@ -5,7 +5,6 @@ const orderSchema = mongoose.Schema(
   {
     customer: {
       type: String,
-      unique: false,
       required: true,
     },
     items: {

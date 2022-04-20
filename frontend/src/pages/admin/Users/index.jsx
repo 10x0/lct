@@ -3,7 +3,7 @@ import axios from "axios";
 import { API } from "../../../api/config";
 import Loading from "../../../components/Loading";
 import { toast } from "react-toastify";
-const Orders = () => {
+const Users = () => {
   const [loading, setLoading] = useState(false);
   const [orders, setOrders] = useState([]);
   const [refresh,setRefresh] = useState(false);
@@ -88,4 +88,4 @@ const Orders = () => {
   );
 };
 
-export default Orders;
+export default Users;

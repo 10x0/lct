@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { SearchIcon, MenuAlt3Icon, LogoutIcon } from "@heroicons/react/outline";
+import { MenuAlt3Icon, LogoutIcon } from "@heroicons/react/outline";
 import { useDispatch } from "react-redux";
 import { logout } from "../redux/reducers/authSlice";
 import logo from "../assets/images/logo.png";
@@ -19,18 +19,9 @@ const Header = () => {
   return (
     <header className="flex md:justify-between m-2 md:m-3">
       <Link to="/" className="select-none text-4xl flex-grow md:flex-grow-0">
-        {/* <span className="text-orange-500">Lunch</span>
-        <span>Time</span> */}
-        <img width="100px" src={logo} alt="" />
+        <img width="100px" src={logo} alt="logo" />
       </Link>
-      <div className="mb-2 md:mb-4 flex ml-2 items-center rounded-xl md:rounded bg-gray-100 p-2">
-        <SearchIcon className="h-8 md:h-6 text-gray-600" />
-        <input
-          className="hidden md:inline-flex ml-2 items-center bg-transparent outline-none placeholder-gray-500 w-96 group"
-          type="text"
-          placeholder="Looking for your favorite food . . ."
-        />
-      </div>
+      
       {authenticated ? (
         <aside className="mb-2 md:flex md:mb-4">
           <div

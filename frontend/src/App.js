@@ -1,5 +1,5 @@
 import "./App.css";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Header from "./components/Header";
 import { useEffect, useMemo } from "react";
 import axios from "axios";
@@ -79,6 +79,7 @@ function App() {
       <Router>
         <Sidebar />
         <Routes>
+          <Route path="/menu" element={<Navigate to='/users' />} />
           {routes.map((i) => {
             const Page = i.component;
             return (

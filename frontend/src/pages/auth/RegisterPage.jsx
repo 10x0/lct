@@ -1,9 +1,7 @@
 import { Formik, Form } from "formik";
-import { useEffect, useMemo } from "react";
-import * as Yup from "yup";
+import { useMemo } from "react";
 import { InputField } from "../../components/Field";
-import image from "../../assets/images/kingdom-the-cook-is-drinking.png";
-import { Link, useNavigate } from "react-router-dom";
+import {  useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";

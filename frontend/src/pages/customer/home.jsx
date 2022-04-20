@@ -13,12 +13,19 @@ const Homepage = () => {
           your grandma <br />
           used to make.
         </h2>
+        <div className="flex gap-2">
         <button
           className="mt-12 py-3 px-4 bg-orange-500 text-xl hover:bg-orange-600 text-white rounded"
           onClick={() => navigate("/menu")}
         >
           Discover our menu
         </button>
+        <button
+          className="mt-12 py-3 px-4 bg-gray-500 text-xl hover:bg-gray-600 text-white rounded"
+          onClick={() => navigate("/book")}
+        >
+          Book a table
+        </button></div>
       </section>
       <section className="flex-1">
         <img src={image} alt="section" />

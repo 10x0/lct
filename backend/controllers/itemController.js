@@ -21,7 +21,6 @@ exports.getItems = asyncHandler(async (req, res, next) => {
 });
 
 exports.createItem = asyncHandler(async (req, res, next) => {
-  console.log("decoding-image");
   const cloud = await cloudinary.uploader.upload(req.body.image, {
     folder: "items",
     overwrite: true,
@@ -58,13 +57,27 @@ exports.getSingleItem = asyncHandler(async (req, res, next) => {
 });
 
 exports.updateItem = asyncHandler(async (req, res, next) => {
+  
+  const cloud = await cloudinary.uploader.upload(req.body.image, {
+    folder: "items",
+    overwrite: true,
+    invalidate: true,
+    width: 400,
+    crop: "scale",
+  });
+
   let item = await Item.findById(req.params.id);
 
   if (!item) {
     return next(new ErrorHandler("Item not found.", 404));
   }
 
-  product = await Item.findByIdAndUpdate(req.params.id, req.body, {
+  product = await Item.findByIdAndUpdate(req.params.id, {
+    ...req.body,
+    image: {
+      public_id: cloud.public_id,
+      url: cloud.secure_url,
+    },}, {
     new: true,
     runValidators: true,
     useFindAndModify: false,

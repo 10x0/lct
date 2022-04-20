@@ -1,5 +1,4 @@
 import { createSlice } from "@reduxjs/toolkit";
-
 export const loginSlice = createSlice({
   name: "authState",
   initialState: {
@@ -8,6 +7,7 @@ export const loginSlice = createSlice({
     user: null,
   },
   reducers: {
+  
     loginPending: (state) => {
       state.loading = true;
     },
@@ -27,7 +27,7 @@ export const loginSlice = createSlice({
       state.loading = false;
       state.authenticated = false;
       state.user = null;
-      localStorage.removeItem("_t");
+      localStorage.removeItem("_t"); 
     },
   },
 });

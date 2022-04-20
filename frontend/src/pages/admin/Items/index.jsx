@@ -8,6 +8,10 @@ import Loading from "../../../components/Loading";
 
 const ItemsPage = () => {
   const [show, setShow] = useState(false);
+  const [edit,setEdit]=useState(false);
+  const [editItem,setEditItem]=useState({});
+  const [del,setDel]=useState(false);
+  const [deleteItem,setDeleteItem]=useState({});
   const [name, setName] = useState("");
   const [price, setPrice] = useState(0);
   const [type, setType] = useState("Veg");
@@ -93,7 +97,6 @@ const ItemsPage = () => {
     <aside className="p-4 flex-col w-full">
       <section className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Menu Items</h2>
-        {/* <section className="flex items-center"> */}
         <section className="relative">
           <button
             className="px-2 p-1 bg-gray-200 rounded-full text-sm flex items-center hover:bg-gray-300"
@@ -186,7 +189,7 @@ const ItemsPage = () => {
                 </div>
                 <button
                   type="submit"
-                  className="bg-orange-400 rounded p-2 m-2 text-white font-semibold hover:bg-orange-500"
+                  className="bg-red-500 rounded p-2 m-2 text-white font-semibold hover:bg-red-600"
                 >
                   Submit
                 </button>
@@ -198,14 +201,205 @@ const ItemsPage = () => {
       <aside className="">
         <section className="flex flex-grow">
           {items ? (
-            items.map((item) => <ItemCard key={item._id} item={item} />)
+            items.map((item) => <ItemCard key={item._id} item={item} setEdit={(value)=>{setEdit(value);setEditItem(item);}} setDel={(value)=>{
+              setDel(value);
+              setDeleteItem(item);
+            }} />)
           ) : (
             <h3>No items</h3>
           )}
         </section>
       </aside>
+      {edit &&
+      <EditModal show={edit} setShow={(value)=>setEdit(value)} editItem={editItem} item={editItem} refresh={refresh} setRefresh={(value)=>setRefresh(value)} setLoading={(value)=>setLoading()} />  }
+
+      {del && <DeleteModal show={del} setShow={(value)=>setDel(value)} item={deleteItem} refresh={refresh} setRefresh={(value)=>setRefresh(value)} setLoading={(value)=>setLoading()} />
+       }
     </aside>
   );
 };
 
 export default ItemsPage;
+
+
+const EditModal=({show,setShow,item,refresh,setRefresh})=>{
+  
+  const [name, setName] = useState("");
+  const [price, setPrice] = useState(0);
+  const [type, setType] = useState("");
+  const [image, setImage] = useState("");
+  const [loading,setLoading] = useState(false);
+
+  useEffect(()=>{
+    setName(item.name);
+    setPrice(item.price);
+    setType(item.type);
+    setImage(item.image.url);
+  },[item.name,item.price,item.type,item.image]);
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    let formData = new FormData();
+    formData.append("name", name);
+    formData.append("price", price);
+    formData.append("type", type);
+    formData.append("image", image);
+    await axios
+      .put(`${API.ITEM.editItem}/${item._id}`, formData, {
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "multipart/form-data",
+            "Authorization": `Bearer ${localStorage.getItem("_t")}`,
+        },
+      })
+      .then((res) => {
+        setLoading(false);
+        toast.success("Item edited.");
+      })
+      .catch((error) =>{
+        setLoading(false);
+        toast.error(
+          error.response?.data?.message ??
+            error.message ??
+            "Internal server error."
+        )
+      }
+      );
+    setRefresh(!refresh);
+    setShow(false);
+  };
+
+  
+  const imageHandler = (e) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (reader.readyState === 2) {
+        setImage(reader.result);
+      }
+    };
+    reader.readAsDataURL(e.target.files[0]);
+  };
+
+  return <div className={`shadow-lg backdrop-blur fixed top-0 left-0 w-screen h-screen ${show ? 'flex' : 'hidden'}`}>
+      <section className="m-auto bg-gray-200 z-10 p-4 rounded-lg">
+        <p className="text-lg font-semibold">Edit</p>
+        <form
+               className="py-2 flex flex-col"
+                onSubmit={onSubmit}
+                encType="multipart/form-data"
+              >
+                <div className="flex justify-between items-center">
+                  <label>Item name:</label>
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="Enter item name"
+                    className="p-2 rounded m-2 outline-none"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </div>
+                <div className="flex justify-between items-center">
+                  <label>Price (NPR):</label>
+                  <input
+                    type="number"
+                    placeholder="Enter item price"
+                    className="p-2 rounded m-2 outline-none"
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value)}
+                  />
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <label>Type:</label>
+                  <select
+                    className="p-2 rounded m-2 outline-none"
+                    value={type}
+                    onChange={(e) => setType(e.target.value)}
+                  >
+                    <option value="Veg">Veg</option>
+                    <option value="Non-Veg">Non-Veg</option>
+                    <option value="Egg">Egg</option>
+                  </select>
+                </div>
+                <div className="self-center w-1/2">
+                  <img
+                    className="h-full w-80"
+                    alt="new-item"
+                    src={image}
+                  />
+                </div>
+                <div className="flex justify-between items-center">
+                  <label className="w-full text-center p-2 rounded m-2 outline-none  bg-gray-400 text-white cursor-pointer hover:bg-gray-500">
+                    Select image
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="w-full hidden"
+                      onChange={imageHandler}
+                    />
+                  </label>
+                </div>
+                {loading ? <Loading />:
+              <div>
+                <button className="bg-gray-100 hover:bg-white p-2 rounded px-4" onClick={()=>setShow(false)}>
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="bg-orange-400 rounded p-2 px-4 m-2 text-white font-semibold hover:bg-orange-500"
+                  >
+                  Submit
+                </button>
+                </div>}
+              </form>
+      </section>
+  </div>
+}
+
+const DeleteModal=({show,setShow,item,refresh,setRefresh,setLoading})=>{
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    await axios
+      .delete(`${API.ITEM.editItem}/${item._id}`, {
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "multipart/form-data",
+            "Authorization": `Bearer ${localStorage.getItem("_t")}`,
+        },
+      })
+      .then((res) => {
+        toast.success("Item deleted successfully.");
+      })
+      .catch((error) =>
+        toast.error(
+          error.response?.data?.message ??
+            error.message ??
+            "Internal server error."
+        )
+      );
+    setLoading(false);
+    setRefresh(!refresh);
+    setShow(false);
+  };
+
+  return <div className={`shadow-lg backdrop-blur fixed top-0 left-0 w-screen h-screen ${show ? 'flex' : 'hidden'}`}>
+      <section className="m-auto bg-gray-200 z-10 p-4 rounded-lg">
+        <p className="text-lg font-semibold">Are you sure to delete this item?</p>
+        <p className="text-lg"> - {item.name}</p>
+        <div>
+                <button className="bg-gray-100 hover:bg-white p-2 rounded px-4" onClick={()=>setShow(false)}>
+                  Cancel
+                </button>
+                <button
+                onClick={onSubmit}
+                  className="bg-red-500 rounded p-2 px-4 m-2 text-white font-semibold hover:bg-red-600"
+                  >
+                  Delete
+                </button>
+        </div>
+      </section>
+  </div>
+}

@@ -38,6 +38,7 @@ const OrdersPage = () => {
       onSuccess(payload) {
         let body = {
           checkout,
+          token: payload.token,
           total: calculatePrice(),
         };
         return axios
@@ -48,6 +49,10 @@ const OrdersPage = () => {
             },
           })
           .then((res) => {
+            toast.success(
+              '🚚 30 min ma ghar gate agaadi.',
+              {position:toast.POSITION.TOP_CENTER}
+            );
             dispatch(removeAllOrders());
             navigate('/menu');
           })

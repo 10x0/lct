@@ -24,10 +24,12 @@ export const API = {
   ORDER: {
     createOrder: `${BASE}/oms/createOrder`,
     getAllOrders: `${BASE}/oms/getAllOrders`,
+    deliverOrder: `${BASE}/oms/deliverOrder`
   },
 
   BOOKING: {
     createBooking: `${BASE}/bms/createBooking`,
     getAllBookings: `${BASE}/bms/getAllBookings`,
+    deleteBooking: `${BASE}/bms/deleteBooking`,
   }
 };

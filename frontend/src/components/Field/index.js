@@ -10,7 +10,7 @@ function InputField({ label = "", ...props }) {
       </label>
       <Field
         required
-        className={`my-2 px-3 py-2 w-full border  rounded shadow-sm focus:outline-none focus:border-2 focus:border-blue-500 `}
+        className={`my-2 px-3 py-2 w-full border  rounded shadow-sm focus:outline-none focus:border-2 focus:border-blue-500`}
         id={props.name}
         name={props.name}
         {...props}

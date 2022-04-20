@@ -1,3 +1,5 @@
+const dotenv = require("dotenv");
+dotenv.config();
 const crypto = require("crypto");
 const { User } = require("../models");
 const ErrorHandler = require("../utils/errorHandler");
@@ -7,6 +9,7 @@ const sendMail = require("../utils/sendMail");
 
 exports.registerUser = asyncHandler(async (req, res, next) => {
   const { name, email, password,contact } = req.body;
+  
   const user = await User.create({
     name,
     email,
@@ -57,9 +60,7 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
 
   await user.save({ validateBeforeSave: false });
 
-  const resetURL = `${req.protocol}://${req.get(
-    "host"
-  )}/reset/${resetToken}`;
+  const resetURL = `${process.env.REACT_APP}/resetPassword/${resetToken}`;
 
   const message = `Reset your password at :- \n\n ${resetURL} \n\nIf you have not requested this email then, please ignore it.`;
   try {

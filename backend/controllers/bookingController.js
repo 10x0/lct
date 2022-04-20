@@ -21,11 +21,12 @@ exports.getBookings = asyncHandler(async (req, res, next) => {
 });
 
 exports.createBooking = asyncHandler(async (req, res, next) => {
-    let { seats, datetime, duration, contact } = req.body;
+    let { seats, date,time, duration, contact } = req.body;
 
     await Booking.create({
         seats,
-        datetime,
+        date,
+        time,
         duration,
         contact
     });
@@ -35,3 +36,18 @@ exports.createBooking = asyncHandler(async (req, res, next) => {
         message: "Table booked succesfully.",
     });
 });
+
+exports.deleteBooking = asyncHandler(async (req, res, next) => {
+    let booking = await Booking.findById(req.params.id);
+  
+    if (!booking) {
+      return next(new ErrorHandler("Booking not found.", 404));
+    }
+  
+    await booking.remove();
+  
+    res.status(200).json({
+      success: true,
+      message: "Booking removed successfully.",
+    });
+  });

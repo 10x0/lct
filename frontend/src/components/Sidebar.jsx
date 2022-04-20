@@ -47,9 +47,12 @@ const Sidebar = () => {
       </div>
       <div
         className="p-2 group cursor-pointer"
-        onClick={() => dispatch(logout())}
+        onClick={() => {
+          dispatch(logout());
+          navigate('/');
+        }}
       >
-        <section className="m-2 p-2 text-xl rounded flex items-center group-hover:bg-orange-400">
+        <section className="m-2 p-2 text-xl rounded flex items-center group-hover:bg-orange-400 group-hover:text-white font-semibold">
           <LoginIcon className="h-8 mr-2" />
           <span>Log Out</span>
         </section>
@@ -62,9 +65,9 @@ export default Sidebar;
 
 const menus = [
   {
-    name: "Dashboard",
+    name: "Users",
     Icon: ViewGridIcon,
-    route: "/",
+    route: "/users",
   },
   {
     name: "Items",
@@ -72,9 +75,9 @@ const menus = [
     route: "/items",
   },
   {
-    name: "Users",
+    name: "Bookings",
     Icon: ViewGridIcon,
-    route: "/users",
+    route: "/bookings",
   },
   {
     name: "Orders",

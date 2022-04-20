@@ -2,7 +2,7 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addOrder, removeOrder } from "../../redux/reducers/orderSlice";
 
-const ItemCard = ({ item }) => {
+const ItemCard = ({ item,setEdit,setDel }) => {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.authState);
   const { orders } = useSelector((state) => state.orderState);
@@ -43,10 +43,10 @@ const ItemCard = ({ item }) => {
           )
         ) : (
           <div>
-            <button className="m-2 py-2 px-4 bg-blue-500 hover:bg-blue-600 text-white rounded">
+            <button onClick={()=>setEdit(true)} className="m-2 py-2 px-4 bg-blue-500 hover:bg-blue-600 text-white rounded">
               Edit
             </button>
-            <button className="m-2 py-2 px-4 bg-red-500 hover:bg-red-600 text-white rounded">
+            <button onClick={()=>setDel(true)} className="m-2 py-2 px-4 bg-red-500 hover:bg-red-600 text-white rounded">
               Delete
             </button>
           </div>
